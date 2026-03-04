@@ -1,8 +1,9 @@
 [project]
 name = "allfactors"
-version = "1.0.0"
+version = "1.0.1"
 description = "AllFactors Python server-side SDK"
 authors = [{name = "AllFactors", email = "team@allfactors.com"}]
+readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 dependencies = [
