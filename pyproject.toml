@@ -1,0 +1,21 @@
+[project]
+name = "allfactors"
+version = "1.0.0"
+description = "AllFactors Python server-side SDK"
+authors = [{name = "AllFactors", email = "team@allfactors.com"}]
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "httpx>=0.28",
+]
+
+[project.urls]
+Repository = "https://github.com/AllFactors/allfactors-python-sdk"
+
+[tool.hatch.build.targets.wheel]
+packages = ["allfactors"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
