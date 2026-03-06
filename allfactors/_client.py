@@ -2,13 +2,17 @@ import hashlib
 import hmac
 import json
 import time
-
+from importlib.metadata import version, PackageNotFoundError
 import httpx
 
 from allfactors._validation._constructor import validate_constructor_args, SanitizedProxyConfig
 from allfactors._validation._signup import validate_signup_args
 
-VERSION = '1.0.0'
+try:
+    VERSION = version('allfactors')
+except PackageNotFoundError:
+    VERSION = '1.0.2' # fallback version if package metadata is not available
+
 _BASE_URL = 'https://sdk-events.allfactors.com'
 _TIMEOUT = 30.0
 _USER_AGENT = f'allfactors-python-sdk/{VERSION}'
@@ -67,7 +71,8 @@ class AllFactors:
         try:
             response = self._client.post(
                 f'/api/v1/validate/{self._domain}/',
-                json={**payload, 'signature': signature},
+                json=payload,
+                headers={'X-Signature': signature, 'X-Access-Key': self._access_key},
             )
             response.raise_for_status()
             data = response.json()
@@ -89,23 +94,22 @@ class AllFactors:
         sanitized = validate_signup_args(email, type, hostname, path, af_usr, af_ses)
         ts = int(time.time() * 1000)
         payload = {
-            'event': {
-                'type': sanitized.type,
-                'email': sanitized.email,
-                'hostname': sanitized.hostname,
-                'path': sanitized.path,
-                'af_usr': sanitized.af_usr,
-                'af_ses': sanitized.af_ses,
-                'ts': ts,
-                'access_key': self._access_key,
-            }
+            'type': sanitized.type,
+            'email': sanitized.email,
+            'hostname': sanitized.hostname,
+            'path': sanitized.path,
+            'af_usr': sanitized.af_usr,
+            'af_ses': sanitized.af_ses,
+            'ts': ts,
+            'access_key': self._access_key,
         }
         signature = _hmac_signature(self._secret_key, payload)
 
         try:
             response = self._client.post(
                 f'/api/v1/signup/{self._domain}/',
-                json={**payload, 'signature': signature},
+                json=payload,
+                headers={'X-Signature': signature, 'X-Access-Key': self._access_key},
             )
             response.raise_for_status()
             return response.json()
@@ -153,7 +157,8 @@ class AsyncAllFactors:
         try:
             response = await self._client.post(
                 f'/api/v1/validate/{self._domain}/',
-                json={**payload, 'signature': signature},
+                json=payload,
+                headers={'X-Signature': signature, 'X-Access-Key': self._access_key},
             )
             response.raise_for_status()
             data = response.json()
@@ -175,23 +180,22 @@ class AsyncAllFactors:
         sanitized = validate_signup_args(email, type, hostname, path, af_usr, af_ses)
         ts = int(time.time() * 1000)
         payload = {
-            'event': {
-                'type': sanitized.type,
-                'email': sanitized.email,
-                'hostname': sanitized.hostname,
-                'path': sanitized.path,
-                'af_usr': sanitized.af_usr,
-                'af_ses': sanitized.af_ses,
-                'ts': ts,
-                'access_key': self._access_key,
-            }
+            'type': sanitized.type,
+            'email': sanitized.email,
+            'hostname': sanitized.hostname,
+            'path': sanitized.path,
+            'af_usr': sanitized.af_usr,
+            'af_ses': sanitized.af_ses,
+            'ts': ts,
+            'access_key': self._access_key,
         }
         signature = _hmac_signature(self._secret_key, payload)
 
         try:
             response = await self._client.post(
                 f'/api/v1/signup/{self._domain}/',
-                json={**payload, 'signature': signature},
+                json=payload,
+                headers={'X-Signature': signature, 'X-Access-Key': self._access_key},
             )
             response.raise_for_status()
             return response.json()
